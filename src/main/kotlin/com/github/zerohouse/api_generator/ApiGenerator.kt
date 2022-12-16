@@ -46,7 +46,7 @@ object ApiGenerator {
     private fun nameFrom(typeName: String, arg: String? = null): String {
         try {
             typeScriptModelSet.add(Class.forName(typeName))
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
         if (!typeName.contains("<")) {
             val name: String = parsedName(typeName)
@@ -207,6 +207,12 @@ object ApiGenerator {
         val result =
             TsGenerator(
                 "Api$requesterClassName",
+
+                constructor = "constructor(private requester: $requesterClassName) {\n" +
+                        methodMap.map { it.key }.joinToString("\n") { type ->
+                            "        this." + memberNamer(typeNamer(type)) + " = new ${typeNamer(type)}(this.requester);"
+                        } + "\n    }",
+
                 parameterTyper = parameterTyper,
                 parameterParser = parameterParser,
                 returnParser = returnParser,
@@ -214,10 +220,11 @@ object ApiGenerator {
                 methodParser = httpMethodParser,
                 queryParamsParser = queryParamsParser,
                 bodyParser = bodyParser,
-                requesterClassName = requesterClassName
-            ).apply {
+                requesterClassName = requesterClassName,
+
+                ).apply {
                 this.members = methodMap.map { it.key }.joinToString("\n    ") { type ->
-                    memberNamer(typeNamer(type)) + " = new ${typeNamer(type)}(this.requester);"
+                    memberNamer(typeNamer(type)) + ";"
                 }
                 this.preClass =
                     "import * as TYPE from './$modelFileName'\n\nabstract class $requesterClassName {\n" +
