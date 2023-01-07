@@ -59,7 +59,9 @@ ${String.format(head, className())}
                 }${
                     if (returnType(it.genericReturnType).typeName.split(".").last()
                             .lowercase(Locale.getDefault()) == "void"
-                    ) ", returnVoid: true" else ""
+                    ) ", returnType: \"void\"" else if (returnType(it.genericReturnType).typeName.split(".").last()
+                            .lowercase(Locale.getDefault()) == "string"
+                    ) ", returnType: \"string\"" else ""
                 }})
     }"""
             }

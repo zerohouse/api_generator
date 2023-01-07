@@ -20,6 +20,16 @@ class UserController {
 
 
     @GetMapping
+    fun string(
+        @RequestParam str: String,
+        @RequestParam(defaultValue = "") str2: String,
+        @RequestParam(required = false) str3: String?,
+    ): String {
+        return ""
+    }
+
+
+    @GetMapping
     fun sdfzxc(
         @RequestParam str: String,
         @RequestParam(defaultValue = "") str2: String,
