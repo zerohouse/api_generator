@@ -56,11 +56,11 @@ object ApiGenerator {
                 )
             }
             if (arg != null) {
-                if (name.startsWith("TYPE."))
+                if (name.startsWith("TYPE.") || name.contains(","))
                     return String.format("%s<%s>", name, arg)
                 return String.format("TYPE.%s<%s>", name, arg)
             } else {
-                if (name.startsWith("TYPE."))
+                if (name.startsWith("TYPE.") || name.contains(","))
                     return name
                 return "TYPE.$name"
             }
