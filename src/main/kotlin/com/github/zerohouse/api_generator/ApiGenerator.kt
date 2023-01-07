@@ -34,53 +34,44 @@ object ApiGenerator {
         "ArrayList" to "%s[]",
         "Set" to "%s[]",
         "HashSet" to "%s[]",
-        "Map" to "Map<%s>",
-        "HashMap" to "Map<%s>",
+        "Map" to "Map",
+        "HashMap" to "Map",
         "Object" to "any",
         "Void" to "void",
-        "void" to "void"
+        "void" to "void",
+        "string" to "string",
+        "number" to "number"
     )
 
     private val typeScriptModelSet = mutableSetOf<Class<*>>()
 
-    private fun nameFrom(typeName: String, arg: String? = null): String {
+    private fun nameFrom(typeName: String): String {
+        if (typeName.contains("<")) {
+            val argInside = typeName.substring(typeName.indexOf("<") + 1, typeName.lastIndexOf(">"))
+            return nameFrom(
+                typeName.substring(0, typeName.indexOf("<")),
+            ) + "<" + nameFrom(argInside) + ">"
+        }
+        if (typeName.contains(","))
+            return typeName.split(",").joinToString(",") {
+                nameFrom(it.trim())
+            }
+
+        val name: String = parsedName(typeName)
+
         try {
-            typeScriptModelSet.add(Class.forName(typeName))
+            typeScriptModelSet.add(Class.forName(name))
         } catch (_: Exception) {
         }
-        if (!typeName.contains("<")) {
-            val name: String = parsedName(typeName)
-            if (defaultTypes.containsKey(name)) {
-                return if (arg != null) String.format(defaultTypes[name]!!, arg) else String.format(
-                    defaultTypes[name]!!, "any"
-                )
-            }
-            if (arg != null) {
-                if (name.startsWith("TYPE."))
-                    return String.format("%s<%s>", name, arg)
-                return String.format("TYPE.%s<%s>", name, arg)
-            } else {
-                if (name.startsWith("TYPE."))
-                    return name
-                return "TYPE.$name"
-            }
+        if (name.startsWith("TYPE."))
+            return name
+        if (defaultTypes.containsKey(name)) {
+            return String.format(defaultTypes[name]!!)
         }
-        return nameFrom(
-            typeName.substring(0, typeName.indexOf("<")),
-            nameFrom(
-                typeName.substring(typeName.indexOf("<") + 1, typeName.lastIndexOf(">"))
-            )
-        )
+        return "TYPE.$name"
     }
 
     private fun parsedName(typeName: String): String {
-        if (typeName.contains(",")) {
-            return Arrays.stream(typeName.split(",").toTypedArray()).map { s: String ->
-                this.nameFrom(
-                    s,
-                )
-            }.collect(Collectors.joining(", "))
-        }
         return if (typeName.contains("$")) typeName.substring(typeName.lastIndexOf("$") + 1) else typeName.substring(
             typeName.lastIndexOf(".") + 1
         )
