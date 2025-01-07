@@ -34,8 +34,8 @@ object ApiGenerator {
         "ArrayList" to "%s[]",
         "Set" to "%s[]",
         "HashSet" to "%s[]",
-        "Map" to "Map<%s>",
-        "HashMap" to "Map<%s>",
+        "Map" to "Map<any, any>",
+        "HashMap" to "Map<any, any>",
         "Object" to "any",
         "Void" to "void",
         "void" to "void"
