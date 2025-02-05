@@ -41,7 +41,7 @@ object ApiGenerator {
         "void" to "void"
     )
 
-    private val typeScriptModelSet = mutableSetOf<Class<*>>()
+    private var typeScriptModelSet = mutableSetOf<Class<*>>()
 
     private fun nameFrom(typeName: String, arg: String? = null): String {
         try {
@@ -186,6 +186,7 @@ object ApiGenerator {
         memberNamer: (String) -> String = defaultMemberNamer
     ) {
 
+        this.typeScriptModelSet = mutableSetOf()
         val ref = Reflections(packageName, Scanners.MethodsAnnotated)
         val methodMap = mutableMapOf<Type, MutableList<Method>>()
 
